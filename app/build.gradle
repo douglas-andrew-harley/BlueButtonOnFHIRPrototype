@@ -22,6 +22,11 @@ android {
     packagingOptions {
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/MANIFEST.MF'
+    }
+
+    dexOptions {
+        javaMaxHeapSize "4g"
     }
 }
 
@@ -31,26 +36,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.2.1'
     compile 'com.android.support:design:23.2.1'
 
-//    compile group: 'ca.uhn.hapi.fhir', name: 'hapi-fhir-android', version: '1.4', classifier: 'dstu2'
-
-    compile ('ca.uhn.hapi.fhir:hapi-fhir-base:1.4') {
-        exclude module: 'stax'
-        exclude module: 'stax-api'
-        exclude module: 'woodstox'
-        exclude module: 'woodstox-core-asl'
-    }
-    compile ('ca.uhn.hapi.fhir:hapi-fhir-structures-hl7org-dstu2:1.4') {
-        exclude module: 'stax'
-        exclude module: 'stax-api'
-        exclude module: 'woodstox'
-        exclude module: 'woodstox-core-asl'
-    }
-    compile ('ca.uhn.hapi.fhir:hapi-fhir-validation-resources-dstu2:1.4') {
-        exclude module: 'stax'
-        exclude module: 'stax-api'
-        exclude module: 'woodstox'
-        exclude module: 'woodstox-core-asl'
-    }
-
-    //compile files('lib/hapi-fhir-android-1.4.jar')
+    compile files('lib/hapi-fhir-client-all-1.4.jar')
 }
