@@ -1,16 +1,29 @@
 package net.dfunkt.bluebuttononfhirprototype;
 
+import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import org.hl7.fhir.instance.model.Patient;
+
+import java.util.logging.Logger;
+
+import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.rest.client.IGenericClient;
+
 public class MainActivity extends AppCompatActivity {
+
+    private static final FhirContext FHIR_DSTU_2_CONTEXT = FhirContext.forDstu2Hl7Org();
+    //private static final String SERVER_BASE_URL = "http://localhost:8080/hapi-fhir-jpaserver-example/baseDstu2";
+    private static final String SERVER_BASE_URL = "http://bluebuttonhapi-test.hhsdevcloud.us/baseDstu2";
+    private static final IGenericClient RESTFUL_CLIENT = FHIR_DSTU_2_CONTEXT.newRestfulGenericClient(SERVER_BASE_URL);
+    private static final Logger LOGGER = Logger.getLogger(MainActivity.class.getName(), null);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,8 +36,30 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Retrieving data from server...", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                new AsyncTask<Void, Void, Void>() {
+                    private ProgressDialog progressDialog;
+                    @Override
+                    protected void onPreExecute() {
+                        super.onPreExecute();
+                        progressDialog = ProgressDialog.show(MainActivity.this, null, "Retrieving data from server", true, false);
+                    }
+                    @Override
+                    protected Void doInBackground(Void... params) {
+                        Patient patient = RESTFUL_CLIENT
+                                .read()
+                                .resource(Patient.class)
+                                .withId("147462")
+                                .execute();
+                        System.out.println("patient =" + patient + "=");
+                        return null;
+                    }
+
+                    @Override
+                    protected void onPostExecute(Void aVoid) {
+                        super.onPostExecute(aVoid);
+                        progressDialog.dismiss();
+                    }
+                }.execute();
             }
         });
     }
