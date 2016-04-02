@@ -1,4 +1,3 @@
 <resources>
     <string name="app_name">BlueButton on FHIR Prototype</string>
-    <string name="action_settings">Settings</string>
 </resources>

@@ -37,4 +37,6 @@ dependencies {
     compile 'com.android.support:design:23.2.1'
 
     compile files('lib/hapi-fhir-client-all-1.4.jar')
+
+    compile 'com.marvinlabs:android-floatinglabel-widgets:1.6.1@aar'
 }

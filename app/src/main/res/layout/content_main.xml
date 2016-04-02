@@ -12,8 +12,21 @@
     tools:context="com.example.douglasharley.bluebuttononfhirprototype.MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <com.marvinlabs.widget.floatinglabel.edittext.FloatingLabelEditText
+        android:id="@+id/patient_id_edit"
+        app:flw_inputWidgetTextSize="@dimen/abc_text_size_large_material"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Hello World!" />
+        app:flw_labelText="Patient ID"
+        android:inputType="number"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"/>
+
+    <TextView
+        android:id="@+id/patient_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        android:layout_below="@id/patient_id_edit"/>
+
 </RelativeLayout>

@@ -9,7 +9,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.marvinlabs.widget.floatinglabel.edittext.FloatingLabelEditText;
+
+import org.hl7.fhir.instance.model.HumanName;
 import org.hl7.fhir.instance.model.Patient;
 
 import java.util.logging.Logger;
@@ -20,7 +26,6 @@ import ca.uhn.fhir.rest.client.IGenericClient;
 public class MainActivity extends AppCompatActivity {
 
     private static final FhirContext FHIR_DSTU_2_CONTEXT = FhirContext.forDstu2Hl7Org();
-    //private static final String SERVER_BASE_URL = "http://localhost:8080/hapi-fhir-jpaserver-example/baseDstu2";
     private static final String SERVER_BASE_URL = "http://bluebuttonhapi-test.hhsdevcloud.us/baseDstu2";
     private static final IGenericClient RESTFUL_CLIENT = FHIR_DSTU_2_CONTEXT.newRestfulGenericClient(SERVER_BASE_URL);
     private static final Logger LOGGER = Logger.getLogger(MainActivity.class.getName(), null);
@@ -31,58 +36,60 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        toolbar.setLogo(R.mipmap.ic_launcher);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new AsyncTask<Void, Void, Void>() {
+                new AsyncTask<Void, Void, Patient>() {
                     private ProgressDialog progressDialog;
+                    private String patientId;
                     @Override
                     protected void onPreExecute() {
                         super.onPreExecute();
+                        patientId = ((FloatingLabelEditText)findViewById(R.id.patient_id_edit)).getInputWidgetText().toString();
                         progressDialog = ProgressDialog.show(MainActivity.this, null, "Retrieving data from server", true, false);
                     }
                     @Override
-                    protected Void doInBackground(Void... params) {
-                        Patient patient = RESTFUL_CLIENT
-                                .read()
-                                .resource(Patient.class)
-                                .withId("147462")
-                                .execute();
-                        System.out.println("patient =" + patient + "=");
-                        return null;
+                    protected Patient doInBackground(Void... params) {
+                        Patient patient = null;
+                        try {
+                            patient = RESTFUL_CLIENT
+                                    .read()
+                                    .resource(Patient.class)
+                                    .withId(patientId)
+                                    .encodedJson()
+                                    .execute();
+                        } catch (Exception exception) {
+                            LOGGER.severe(exception.toString());
+                        }
+                        LOGGER.info("patient =" + patient + "=");
+                        return patient;
                     }
 
                     @Override
-                    protected void onPostExecute(Void aVoid) {
-                        super.onPostExecute(aVoid);
+                    protected void onPostExecute(Patient patient) {
+                        super.onPostExecute(patient);
                         progressDialog.dismiss();
+                        TextView textView = (TextView)MainActivity.this.findViewById(R.id.patient_view);
+                        if(null == patient) {
+                            Toast.makeText(MainActivity.this, "No patient with ID '" + patientId + "' found", Toast.LENGTH_LONG).show();
+                            textView.setVisibility(View.INVISIBLE);
+                        } else {
+                            String string = "";
+                            for(HumanName name : patient.getName()) {
+                                string += "GIVEN NAME: " + name.getGiven().get(0) + "\n";
+                                string += "FAMILY NAME: " + name.getFamily().get(0) + "\n";
+                            }
+                            string += "BIRTH DATE: " + patient.getBirthDate() + "\n";
+                            LOGGER.info("string =" + string + "=");
+                            textView.setText(string);
+                            textView.setVisibility(View.VISIBLE);
+                        }
                     }
                 }.execute();
             }
         });
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 }
