@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/BlueButtononFHIRPrototype.iml" filepath="$PROJECT_DIR$/BlueButtononFHIRPrototype.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/hapi-fhir-android-client/hapi-fhir-android-client.iml" filepath="$PROJECT_DIR$/hapi-fhir-android-client/hapi-fhir-android-client.iml" />
     </modules>
   </component>
 </project>

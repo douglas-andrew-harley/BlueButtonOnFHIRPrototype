@@ -1,0 +1,41 @@
+buildscript {
+    repositories { jcenter() }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+repositories {
+    mavenCentral()
+    maven {
+        url "https://oss.sonatype.org/content/repositories/snapshots"
+    }
+}
+
+dependencies {
+    compile 'ca.uhn.hapi.fhir:hapi-fhir-base:1.4'
+    compile 'ca.uhn.hapi.fhir:hapi-fhir-structures-hl7org-dstu2:1.4'
+    compile 'ca.uhn.hapi.fhir:hapi-fhir-validation-resources-dstu2:1.4'
+    compile 'org.slf4j:slf4j-simple:1.6.1'
+}
+
+task fatJar(type: Jar) {
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+shadowJar {
+    relocate 'org.apache.http', 'net.dfunkt.org.apache.http'
+    relocate 'javax.xml', 'net.dfunkt.javax.xml'
+}
+
+configurations {
+    uberjar
+}
+
+artifacts {
+    uberjar shadowJar
+}
